@@ -1,4 +1,4 @@
-package uk.lset.Config;
+package uk.lset.config;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

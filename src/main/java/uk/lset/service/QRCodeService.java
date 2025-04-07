@@ -7,7 +7,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.lset.entities.Product;
+import uk.lset.entities.Products;
 import uk.lset.repository.ProductRepository;
 
 import javax.imageio.ImageIO;
@@ -25,13 +25,13 @@ public class QRCodeService {
         this.productRepository = productRepository;
     }
 
-    public byte[] generateQRCode(Product product) throws WriterException, IOException {
+    public byte[] generateQRCode(Products products) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();//initializing QRCodeWritter . QRCodeWritter is a class from the ZXing library to generate QR codes
-        product = productRepository.findById(product.getProductId()).orElse(null);
-        if (product == null) {
+        products = productRepository.findById(products.getProductId()).orElse(null);
+        if (products == null) {
             throw new IllegalArgumentException("Product not found");
         }
-        BitMatrix bitMatrix = qrCodeWriter.encode(product.toString(), BarcodeFormat.QR_CODE,250,250);
+        BitMatrix bitMatrix = qrCodeWriter.encode(products.toString(), BarcodeFormat.QR_CODE,250,250);
         BufferedImage bufferedImage = new BufferedImage(250,250, BufferedImage.TYPE_INT_RGB);
         bufferedImage.createGraphics().fillRect(0,0,250,250);
         Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();

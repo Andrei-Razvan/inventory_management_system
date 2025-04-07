@@ -1,4 +1,4 @@
-package uk.lset.Config;
+package uk.lset.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

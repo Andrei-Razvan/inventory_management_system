@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import uk.lset.dto.ProductDTO;
-import uk.lset.entities.Product;
+import uk.lset.entities.Products;
 import uk.lset.service.ProductService;
 
 import java.util.List;
@@ -18,7 +18,6 @@ import java.util.Optional;
 
 @Validated
 @RestController
-@RequestMapping("api/products")
 public class ProductController {
 
     @Autowired
@@ -27,9 +26,9 @@ public class ProductController {
     //Add new Product
 
     @PostMapping(path = "addNewProduct")
-    public ResponseEntity<?> addNewProduct(@RequestBody Product product){
+    public ResponseEntity<?> addNewProduct(@RequestBody Products products){
         try {
-            return ResponseEntity.ok(productService.addNewProduct(product));
+            return ResponseEntity.ok(productService.addNewProduct(products));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error" + e.getMessage());
         }
@@ -38,22 +37,22 @@ public class ProductController {
 
     //Request all products
 
-    @GetMapping(path = "all")
-    public @ResponseBody List<Product> getAllProducts(){
-        Product product = null;
-        return productService.getAllProducts(product);
+    @GetMapping(path = "/products/all")
+    public ResponseEntity<List<Products>> getAllProducts(){
+        List<Products> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
 
 
     //Get all products sorted
-    //localhost:8001/products/sort?sortBy=?&ascending=?
-    @GetMapping(path = "/sort")
-    public Page<Product> sortProducts(@RequestParam(defaultValue = "0") int page,
-                                      @RequestParam(defaultValue = "10") int size,
-                                      @RequestParam (required = false) String category,
-                                      @RequestParam(defaultValue = "name") String sortBy,
-                                      @RequestParam(defaultValue = "true") boolean ascending) {
+    //products/sort?sortBy=?&ascending=?
+    @GetMapping(path = "/products/sort")
+    public Page<Products> sortProducts(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam (required = false) String category,
+                                       @RequestParam(defaultValue = "name") String sortBy,
+                                       @RequestParam(defaultValue = "true") boolean ascending) {
 
         Sort sort = ascending? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         return productService.getAllProductsSorted(page, size, sort, category);
@@ -61,33 +60,30 @@ public class ProductController {
 
 
     //get products by productId
-    @GetMapping(path = "/{id}")
-    public Optional<Product> productsById(@PathVariable String id){
-        Optional<Product> optionalProduct = productService.getProductByProductId(id);
-        if (optionalProduct.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-        }
-        return productService.getProductByProductId(id);
+    @GetMapping(path = "/products/{id}")
+    public ResponseEntity<Products> productsById(@PathVariable String id){
+        Products products = productService.getProductById(id);
+        return ResponseEntity.ok(products);
     }
 
     //Update product
-    @PutMapping(path = "/update/{id}")
-    public ResponseEntity<?> updateProduct(@RequestBody Product product, @PathVariable String id) {
+    @PutMapping(path = "/products/update/{id}")
+    public ResponseEntity<?> updateProduct(@RequestBody Products products, @PathVariable String id) {
         try {
-            Optional<Product> productOptional = productService.getProductByProductId(id);
+            Optional<Products> productOptional = productService.getProductByProductId(id);
             if (productOptional.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
             }
-            Product updatedProduct = null;
-            Product productToUpdate = productOptional.get();
-            productToUpdate.setProductName(product.getProductName());
-            productToUpdate.setProductDescription(product.getProductDescription());
-            productToUpdate.setProductQuantity(product.getProductQuantity());
-            productToUpdate.setCategory(product.getCategory());
-            productToUpdate.setPrice(product.getPrice());
-            productToUpdate.setInventoryId(product.getInventoryId());
-            updatedProduct = productService.updateProduct(productToUpdate);
-            return ResponseEntity.ok(updatedProduct);
+            Products updatedProducts = null;
+            Products productsToUpdate = productOptional.get();
+            productsToUpdate.setProductName(products.getProductName());
+            productsToUpdate.setProductDescription(products.getProductDescription());
+            productsToUpdate.setProductQuantity(products.getProductQuantity());
+            productsToUpdate.setCategory(products.getCategory());
+            productsToUpdate.setPrice(products.getPrice());
+            productsToUpdate.setInventoryId(products.getInventoryId());
+            updatedProducts = productService.updateProduct(productsToUpdate);
+            return ResponseEntity.ok(updatedProducts);
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         } catch (Exception e) {
@@ -98,7 +94,7 @@ public class ProductController {
 
 
     //Delete product by supplierCode
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/products/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable String id){
         try {
             productService.deleteProduct(id);
@@ -110,20 +106,20 @@ public class ProductController {
         }
     }
 
-    @GetMapping(path = "/stocks/{id}")
+    @GetMapping(path = "/products/stocks/{id}")
     public @ResponseBody ProductDTO getProductStocks(@PathVariable String id){
         return productService.getProductStock(id);
     }
 
-    @PutMapping(path = "/updateStock/{productId}")
-    public ResponseEntity<Product> updateStock(@PathVariable String productId, @RequestParam int newQuantity){
-        Product updateProductQuantity = productService.updateStock(productId, newQuantity);
-        return ResponseEntity.ok(updateProductQuantity);
+    @PutMapping(path = "/products/updateStock/{productId}")
+    public ResponseEntity<Products> updateStock(@PathVariable String productId, @RequestParam int newQuantity){
+        Products updateProductsQuantity = productService.updateStock(productId, newQuantity);
+        return ResponseEntity.ok(updateProductsQuantity);
     }
 
-    @PostMapping(path = "addStock/{productId}")
-    public ResponseEntity<Product> addStock(@PathVariable String productId, @RequestParam @Min(0) int newQuantity){
-        Product newProductQuantity = productService.addStock(productId, newQuantity);
-        return ResponseEntity.ok(newProductQuantity);
+    @PostMapping(path = "/products/addStock/{productId}")
+    public ResponseEntity<Products> addStock(@PathVariable String productId, @RequestParam @Min(0) int newQuantity){
+        Products newProductsQuantity = productService.addStock(productId, newQuantity);
+        return ResponseEntity.ok(newProductsQuantity);
     }
 }

@@ -1,4 +1,4 @@
-package uk.lset.Config;
+package uk.lset.config;
 
 
 import com.nimbusds.jose.JWSAlgorithm;

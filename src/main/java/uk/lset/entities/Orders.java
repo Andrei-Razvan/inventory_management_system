@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -22,13 +23,13 @@ import java.util.UUID;
 public class Orders {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator()
     @Column(name = "order_id",updatable = false, nullable = false)
-    private UUID order_Id;
+    private String orderId;
 
     @Column(name = "client_name")
     @NotBlank(message = "Name is required")
-    private String client_Name;
+    private String clientName;
 
     @Column(name = "email")
     @NotBlank(message = "Email is required")
@@ -37,7 +38,7 @@ public class Orders {
 
     @Column(name = "inventory_id")
     @NotBlank(message  = "Inventory id is required")
-    private String productId;
+    private String productInventoryId;
 
     @Column(name = "quantity")
     @Min(value = 1, message = "Order quantity must be 1")
@@ -51,12 +52,16 @@ public class Orders {
 
     @Column(name = "delivery_address")
     @NotBlank(message = "Delivery address is required")
-   private String deliveryAddress;
+    private String deliveryAddress;
 
     @Column(name = "status")
     private String status;
 
-    //private String corder;
+    @Column(name = "order_date")
+    private String orderDate;
+
+    @Column(name = "coder")
+    private String coder;
 
 
 }

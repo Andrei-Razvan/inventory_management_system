@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import uk.lset.entities.Product;
+import uk.lset.entities.Products;
 import uk.lset.service.ProductService;
 import uk.lset.service.QRCodeService;
 
@@ -31,7 +31,7 @@ public class QRCodeController {
 
     @GetMapping(path = "/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode(@RequestParam String text) throws IOException, WriterException {
-        Optional<Product> product = productService.getProductByProductId(text);
+        Optional<Products> product = productService.getProductByProductId(text);
         if(product.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }

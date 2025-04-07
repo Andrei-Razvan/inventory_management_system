@@ -1,15 +1,21 @@
 package uk.lset.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import uk.lset.entities.Orders;
-import uk.lset.entities.Product;
+import uk.lset.entities.Products;
+import uk.lset.exception.InsufficientStockException;
+import uk.lset.exception.ItemNotFoundException;
+import uk.lset.exception.QuantityBadRequestException;
 import uk.lset.repository.OrdersRepository;
 import uk.lset.repository.ProductRepository;
+import uk.lset.request.OrderRequest;
 
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,31 +35,45 @@ public class OrdersService {
     private final ProductRepository productRepository;
 
 
-/*
-    public Orders addNewOrder(String productId, int quantity) {
+    public Orders addNewOrder(@RequestBody OrderRequest orderRequest, String productId, int quantity) {
         if(!productRepository.existsById(productId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Product with id " + productId + " does not exists." );
+            throw new ItemNotFoundException("Product with id " + productId + " does not exists." );
+        } else if (quantity <= 1) {
+            throw new QuantityBadRequestException("Quantity must be greater than zero.");
+        }
+        Products orderProducts = productService.getProductById(productId);
+
+        if(orderProducts.getProductQuantity() < quantity) {
+            throw new InsufficientStockException("Not enough stock available." + orderProducts.getProductQuantity() + " items left.");
         }
 
-        Product orderProduct = productService.getProductById(productId);
         Orders order = new Orders();
-
-        order.setProductId(orderProduct.getInventoryId());
-        order.setProductPrice(orderProduct.getPrice());
+        order.setProductInventoryId(orderProducts.getInventoryId());
+        order.setProductPrice(orderProducts.getPrice());
         order.setQuantity(quantity);
-        order.setOrderValue(quantity * orderProduct.getPrice());
-        order.setCorder(UUID.randomUUID().toString());
-(
-        order.setClient_Name(client_Name);
-        order.setEmail(email);
-        order.setDeliveryAddress(deliveryAddress);
-        order.setStatus(status);
+        order.setOrderValue(quantity * orderProducts.getPrice());
+        order.setCoder(generateCoder());
+        order.setClientName(orderRequest.getClientName());
+        order.setEmail(orderRequest.getEmail());
+        order.setDeliveryAddress(orderRequest.getDeliveryAddress());
+        order.setStatus(orderRequest.getStatus());
+        order.setOrderDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return ordersRepository.save(order);
     }
 
     private String generateCoder(){
-        return "C-" + UUID.randomUUID().toString().substring(0, 8);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+        return "O-" + timeStamp + "-" + UUID.randomUUID().toString().substring(0, 10);
     }
-    */
 
+
+    @Transactional(readOnly = true)
+    public List<Orders> getAllOrders() {
+        return ordersRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Orders getOrderById(String id){
+        return ordersRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Order with id " + id + " does not exists."));
+    }
 }

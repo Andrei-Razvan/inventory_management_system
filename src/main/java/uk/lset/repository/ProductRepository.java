@@ -5,15 +5,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import uk.lset.entities.Product;
+import uk.lset.entities.Products;
 
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, String> {
+public interface ProductRepository extends JpaRepository<Products, String> {
 
     boolean existsByInventoryId(String inventoryId);
     boolean existsByProductId(String productId);
-    Page<Product> findByCategory(String category, Pageable pageable);
+    Page<Products> findByCategory(String category, Pageable pageable);
 
 
 }

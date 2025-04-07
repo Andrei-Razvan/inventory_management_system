@@ -16,11 +16,11 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "products")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter @Setter
-public class Product {
+public class Products {
 
     @Id
     @UuidGenerator
-    @Column(name = "product_id")
+    @Column(name = "product_id",updatable = false, nullable = false)
     private String productId;
 
     @Column(name = "product_name")
