@@ -40,6 +40,10 @@ public class Orders {
     @NotBlank(message  = "Inventory id is required")
     private String productInventoryId;
 
+    @Column(name = "product_name")
+    @NotBlank(message = "Product name is required")
+    private String productName;
+
     @Column(name = "quantity")
     @Min(value = 1, message = "Order quantity must be 1")
     private int quantity;
@@ -55,7 +59,8 @@ public class Orders {
     private String deliveryAddress;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(name = "order_date")
     private String orderDate;

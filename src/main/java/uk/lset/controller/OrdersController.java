@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.lset.dto.UpdateOrderStatus;
 import uk.lset.entities.Orders;
 import uk.lset.request.OrderRequest;
 import uk.lset.service.OrdersService;
@@ -39,7 +40,14 @@ public class OrdersController {
     public ResponseEntity<Orders> getOrderById(@PathVariable String id) {
         Orders orders = ordersService.getOrderById(id);
         return ResponseEntity.ok(orders);
+    }
+
+    @PutMapping("orders/updateStatusOrder/{id}")
+    public ResponseEntity<Orders> updateStatusOrder(@PathVariable String id, @RequestBody UpdateOrderStatus updateOrderStatus) {
+            Orders updatedStatusOrder = ordersService.updateOrderStatus(id, updateOrderStatus.getStatus());
+            return ResponseEntity.ok(updatedStatusOrder);
 
     }
+
 }
 

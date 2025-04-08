@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import uk.lset.entities.OrderStatus;
 import uk.lset.entities.Orders;
 import uk.lset.entities.Products;
 import uk.lset.exception.InsufficientStockException;
@@ -49,6 +50,7 @@ public class OrdersService {
 
         Orders order = new Orders();
         order.setProductInventoryId(orderProducts.getInventoryId());
+        order.setProductName(orderProducts.getProductName());
         order.setProductPrice(orderProducts.getPrice());
         order.setQuantity(quantity);
         order.setOrderValue(quantity * orderProducts.getPrice());
@@ -56,7 +58,7 @@ public class OrdersService {
         order.setClientName(orderRequest.getClientName());
         order.setEmail(orderRequest.getEmail());
         order.setDeliveryAddress(orderRequest.getDeliveryAddress());
-        order.setStatus(orderRequest.getStatus());
+        order.setStatus(OrderStatus.ACCEPTED);
         order.setOrderDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return ordersRepository.save(order);
     }
@@ -75,5 +77,12 @@ public class OrdersService {
     @Transactional(readOnly = true)
     public Orders getOrderById(String id){
         return ordersRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Order with id " + id + " does not exists."));
+    }
+
+    @Transactional
+    public Orders updateOrderStatus(String id, OrderStatus newOrderStatus) {
+        Orders order = ordersRepository.findById(id).orElseThrow(()->new ItemNotFoundException("Order with id " + id + " does not exists."));
+        order.setStatus(newOrderStatus);
+        return ordersRepository.save(order);
     }
 }
